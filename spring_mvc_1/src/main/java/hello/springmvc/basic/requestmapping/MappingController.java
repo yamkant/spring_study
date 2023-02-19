@@ -39,18 +39,18 @@ public class MappingController {
         return "ok";
     }
 
-    @GetMapping("/mapping/users/{userId}")
-    public String mappingPath(@PathVariable("userId") String data) {
-        log.info("mappingPath userId={}", data);
+    @GetMapping("/mapping/tests/{testId}")
+    public String mappingPath(@PathVariable("testId") String data) {
+        log.info("mappingPath testId={}", data);
         return "ok";
     }
 
-    @GetMapping("/mapping/users/{userId}/orders/{orderId}")
+    @GetMapping("/mapping/tests/{testId}/orders/{orderId}")
     public String mappingPath(
-            @PathVariable("userId") String userId,
+            @PathVariable("testId") String testId,
             @PathVariable("orderId") Long orderId
             ) {
-        log.info("mappingPath userId={} orderId={}", userId, orderId);
+        log.info("mappingPath testId={} orderId={}", testId, orderId);
         return "ok";
     }
 
