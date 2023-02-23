@@ -6,10 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -45,9 +42,46 @@ public class BasicItemController {
         return "basic/addForm";
     }
 
+    // @PostMapping("/add")
+    public String addItemV1(@RequestParam String itemName,
+                       @RequestParam int price,
+                       @RequestParam Integer quantity,
+                       Model model) {
+        Item item = new Item();
+        item.setItemName(itemName);
+        item.setPrice(price);
+        item.setQuantity(quantity);
+
+        itemRepository.save(item);
+
+        model.addAttribute("item", item);
+
+        return "basic/item";
+    }
+
+    // @PostMapping("/add")
+    public String addItemV2(@ModelAttribute("item") Item item, Model model) {
+
+        itemRepository.save(item);
+        // NOTE: @ModelAttribute에 설정된 "item"은 레더링 시 내려줄 객체의 '키'입니다.
+        // NOTE: 만약 @ModelAttribute에 설정된 값과 addAttribute 두 값이 같으면 V3와 같이 생략가능합니다.
+        model.addAttribute("item", item);
+
+        return "basic/item";
+    }
+
+    // NOTE: 만약 @ModelAttribute의 item을 제거한다면, 입력 매개변수 클래스의 첫 글자를 소문자로 바꾼 값이 입력됩니다.
+    // @PostMapping("/add")
+    public String addItemV3(@ModelAttribute("item") Item item) {
+        itemRepository.save(item);
+        return "basic/item";
+    }
+
+    // NOTE: @ModelAttribute 생략시 기본적으로 @ModelAttribute 애노테이션이 붙습니다.
     @PostMapping("/add")
-    public String save() {
-        return "basic/addForm";
+    public String addItemV4(Item item) {
+        itemRepository.save(item);
+        return "basic/item";
     }
 
     /**
