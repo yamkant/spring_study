@@ -3,6 +3,7 @@ package hello.itemservice.web.form;
 import hello.itemservice.domain.item.Item;
 import hello.itemservice.domain.item.ItemRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -10,6 +11,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
+@Slf4j
 @Controller
 @RequestMapping("/form/items")
 @RequiredArgsConstructor
@@ -39,6 +41,11 @@ public class FormItemController {
 
     @PostMapping("/add")
     public String addItem(@ModelAttribute Item item, RedirectAttributes redirectAttributes) {
+
+        // NOTE: 체크박스가 체크된 경우는 open=on와 _open=on 둘다 볼 수 있고 true로 인식,
+        //       체크박스 체크되지 않은 경우는 _open=on 정보만 받을 수 있으므로 false로 인식합니다.
+        log.info("item.open={}", item.getOpen());
+
         Item savedItem = itemRepository.save(item);
         redirectAttributes.addAttribute("itemId", savedItem.getId());
         redirectAttributes.addAttribute("status", true);
