@@ -7,15 +7,19 @@
 <body>
 <h1>부분 포함</h1>
 <h2>부분 포함 insert</h2>
+<!--div를 없애지 않고 태그 사이에 copy로 명명된 fragment를 삽입하는 방식입니다.-->
 <div th:insert="~{template/fragment/footer :: copy}"></div>
 
 <h2>부분 포함 replace</h2>
+<!--기존 div 태그 자체를 copy로 명명된 fragment로 대체하는 방식입니다.-->
 <div th:replace="~{template/fragment/footer :: copy}"></div>
 
 <h2>부분 포함 단순 표현식</h2>
+<!--단순한 경로인 경우 생략 가능합니다.-->
 <div th:replace="template/fragment/footer :: copy"></div>
 
 <h1>파라미터 사용</h1>
+<!--파라미터를 넘기면 변수가 바인딩 되어 인자로 넣은 값으로 치환됩니다.-->
 <div th:replace="~{template/fragment/footer :: copyParam ('데이터1', '데이터 2')}"></div>
 
 </body>
