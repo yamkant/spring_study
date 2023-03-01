@@ -40,6 +40,15 @@
 
     <hr class="my-4">
 
+    <div>판매 여부</div>
+    <div>
+        <div class="form-check">
+            <!-- th:field를 사용하면, 값이 참이면 checked 값까지 넣어주어 상품이 선택되었는지 여부까지 직접 신경쓰지 않아도 됩니다.. -->
+            <input type="checkbox" id="open" th:field="${item.open}" name="open" class="form-check-input" disabled>
+            <label for="open" class="form-check-label">판매 오픈</label>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col">
             <button class="w-100 btn btn-primary btn-lg"
