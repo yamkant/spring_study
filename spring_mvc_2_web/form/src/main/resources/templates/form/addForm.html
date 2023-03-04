@@ -56,9 +56,23 @@
         <div>판매 여부</div>
         <div>
             <div class="form-check">
-                <!-- th:field를 체크박스에서 사용하는 경우, hidden field를 자동으로 추가합니다.-->
+                <!-- th:field를 체크박스에서 사용하는 경우, _open이라는 id로 hidden field를 자동으로 추가합니다.-->
                 <input type="checkbox" id="open" th:field="*{open}" name="open" class="form-check-input">
                 <label for="open" class="form-check-label">판매 오픈</label>
+            </div>
+        </div>
+
+        <!-- multi checkbox -->
+        <div>
+            <div>등록 지역</div>
+            <div th:each="region : ${regions}" class="form-check form-check-inline">
+                <!-- *{regions}는 form 태그의 item의 변수입니다. -->
+                <input type="checkbox" th:field="*{regions}" th:value="${region.key}"
+                       class="form-check-input">
+                <!-- thymeleaf에서 루프를 돌 떄 id를 기본적으로 부여하기 때문에, 동적으로 id 생성에 대한 처리가 가능합니다. -->
+                <!-- th:field를 체크박스에서 사용하는 경우, 단일 체크박스와 같이 _regions id로 hidden field를 자동으로 추가합니다.-->
+                <label th:for="${#ids.prev('regions')}"
+                       th:text="${region.value}" class="form-check-label">서울</label>
             </div>
         </div>
 
@@ -73,6 +87,7 @@
                         type="button">취소</button>
             </div>
         </div>
+
 
     </form>
 
