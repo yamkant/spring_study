@@ -62,6 +62,18 @@
         </div>
     </div>
 
+    <!-- radio button -->
+    <div>
+        <div>상품 종류</div>
+        <div th:each="type : ${itemTypes}" class="form-check form-check-inline">
+            <input type="radio" th:field="${item.itemType}" th:value="${type.name()}" class="form-check-input" disabled>
+            <!-- 라디오버튼의 경우는, hidden field가 따로 추가되지 않습니다. 선택하지 않으면 null로 반환됩니다. -->
+            <label th:for="${#ids.prev('itemType')}" th:text="${type.getDescription()}" class="form-check-label">
+                BOOK
+            </label>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col">
             <button class="w-100 btn btn-primary btn-lg"

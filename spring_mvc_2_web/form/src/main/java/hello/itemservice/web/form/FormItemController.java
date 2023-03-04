@@ -2,6 +2,7 @@ package hello.itemservice.web.form;
 
 import hello.itemservice.domain.item.Item;
 import hello.itemservice.domain.item.ItemRepository;
+import hello.itemservice.domain.item.ItemType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -34,6 +35,12 @@ public class FormItemController {
         return regions;
     }
 
+    // NOTE: enum으로 기존에 생성해두었던 배열을 그대로 사용합니다.
+    @ModelAttribute("itemTypes")
+    public ItemType[] itemTypes() {
+        return ItemType.values();
+    }
+
     @GetMapping
     public String items(Model model) {
         List<Item> items = itemRepository.findAll();
@@ -61,6 +68,7 @@ public class FormItemController {
         //       체크박스 체크되지 않은 경우는 _open=on 정보만 받을 수 있으므로 false로 인식합니다.
         log.info("item.open={}", item.getOpen());
         log.info("item.regions={}", item.getRegions());
+        log.info("item.itemType={}", item.getItemType());
 
         Item savedItem = itemRepository.save(item);
         redirectAttributes.addAttribute("itemId", savedItem.getId());
