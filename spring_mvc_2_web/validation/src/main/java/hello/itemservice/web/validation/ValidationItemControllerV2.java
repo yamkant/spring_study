@@ -82,7 +82,7 @@ public class ValidationItemControllerV2 {
     }
 
     // NOTE: spring으로 값이 넘어올 때, item 객체에 넣기 전, BindingResult는 입력받은 값을 넣어둡니다.
-    @PostMapping("/add")
+    // @PostMapping("/add")
     public String addItemV2(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
 
         // 검증 오류 결과 보관 객체 생성
@@ -112,6 +112,53 @@ public class ValidationItemControllerV2 {
                 // ObjectError는 필드로 값이 넘어오는게 아닌, 여러 필드의 값을 조합하는 역할을 하기 때문에, 필드 에러와 다릅니다.
                 bindingResult.addError(new ObjectError("item",
                         null, null,
+                        "가격 * 수량의 합은 10,000원 이상이어야합니다. 현재 값: = " + resultPrice));
+            }
+        }
+        // 검증에 실패하면 다시 입력 폼으로 돌아가도록 설정합니다.
+        if (bindingResult.hasErrors()) {
+            log.info("errors = {}", errors);
+            model.addAttribute("errors", errors);
+            return "validation/v2/addForm";
+        }
+
+        // 성공 로직
+        Item savedItem = itemRepository.save(item);
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/validation/v2/items/{itemId}";
+    }
+
+    // 오류 메시지 자체를 errors.properties 파일에 설정하여 처리합니다.
+    @PostMapping("/add")
+    public String addItemV3(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+
+        // 검증 오류 결과 보관 객체 생성
+        Map<String, String> errors = new HashMap<>();
+
+        if (!StringUtils.hasText(item.getItemName())) {
+            // String 배열을 입력해주어 못찾는 경우 순서대로 찾도록 합니다.
+            bindingResult.addError(new FieldError("item", "itemName",
+                    item.getItemName(), false, new String[]{"required.item.itemName", "required.default"}, null,
+                    null));
+        }
+        if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) {
+            bindingResult.addError(new FieldError("item", "price",
+                    item.getPrice(), false, new String[]{"range.item.price"}, new Object[]{1000, 1000000},
+                    null));
+        }
+        if (item.getQuantity() == null || item.getQuantity() >= 9999) {
+            bindingResult.addError(new FieldError("item", "quantity",
+                    item.getQuantity(), false, new String[]{"max.item.quantity"}, new Object[]{9999},
+                    null));
+        }
+
+        if (item.getPrice() != null && item.getQuantity() != null) {
+            int resultPrice = item.getPrice() * item.getQuantity();
+            if (resultPrice < 10000) {
+                // ObjectError는 필드로 값이 넘어오는게 아닌, 여러 필드의 값을 조합하는 역할을 하기 때문에, 필드 에러와 다릅니다.
+                bindingResult.addError(new ObjectError("item",
+                        new String[]{"totalPriceMin"}, new Object[]{10000, resultPrice},
                         "가격 * 수량의 합은 10,000원 이상이어야합니다. 현재 값: = " + resultPrice));
             }
         }
