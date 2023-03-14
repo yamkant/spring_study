@@ -187,7 +187,7 @@ public class ValidationItemControllerV2 {
         Map<String, String> errors = new HashMap<>();
 
         if (!StringUtils.hasText(item.getItemName())) {
-            // errors.properties에서 앞 부분만 입력합니다.
+            // errors.properties에서 detail한 순서대로 값을 읽어옵니다. Level1이 더 구체적이기 때문에 Level1이 없을 때 Level2가 표현됩니다.
             bindingResult.rejectValue("itemName", "required");
         }
         if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) {
