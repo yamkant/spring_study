@@ -130,7 +130,7 @@ public class ValidationItemControllerV2 {
     }
 
     // 오류 메시지 자체를 errors.properties 파일에 설정하여 처리합니다.
-    @PostMapping("/add")
+    // @PostMapping("/add")
     public String addItemV3(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
 
         // 검증 오류 결과 보관 객체 생성
@@ -160,6 +160,47 @@ public class ValidationItemControllerV2 {
                 bindingResult.addError(new ObjectError("item",
                         new String[]{"totalPriceMin"}, new Object[]{10000, resultPrice},
                         "가격 * 수량의 합은 10,000원 이상이어야합니다. 현재 값: = " + resultPrice));
+            }
+        }
+        // 검증에 실패하면 다시 입력 폼으로 돌아가도록 설정합니다.
+        if (bindingResult.hasErrors()) {
+            log.info("errors = {}", errors);
+            model.addAttribute("errors", errors);
+            return "validation/v2/addForm";
+        }
+
+        // 성공 로직
+        Item savedItem = itemRepository.save(item);
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/validation/v2/items/{itemId}";
+    }
+
+    // NOTE: addError를 rejectValue로 변경하여 처리합니다. bindingResult가 ObjectName, target을 반환하는 것에 대한 규칙을 적용합니다.
+    @PostMapping("/add")
+    public String addItemV4(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+
+        log.info("objectName={}", bindingResult.getObjectName());
+        log.info("target={}", bindingResult.getTarget());
+
+        // 검증 오류 결과 보관 객체 생성
+        Map<String, String> errors = new HashMap<>();
+
+        if (!StringUtils.hasText(item.getItemName())) {
+            // errors.properties에서 앞 부분만 입력합니다.
+            bindingResult.rejectValue("itemName", "required");
+        }
+        if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) {
+            bindingResult.rejectValue("price", "range", new Object[]{1000, 1000000}, null);
+        }
+        if (item.getQuantity() == null || item.getQuantity() >= 9999) {
+            bindingResult.rejectValue("quantity", "max", new Object[]{9999}, null);
+        }
+
+        if (item.getPrice() != null && item.getQuantity() != null) {
+            int resultPrice = item.getPrice() * item.getQuantity();
+            if (resultPrice < 10000) {
+                bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
             }
         }
         // 검증에 실패하면 다시 입력 폼으로 돌아가도록 설정합니다.
