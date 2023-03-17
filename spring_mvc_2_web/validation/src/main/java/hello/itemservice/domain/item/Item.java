@@ -19,16 +19,16 @@ public class Item {
     // 하지만, 위의 두 방식으로 수정하면 등록 상황에서는 의도대로 동작하지 않는 side-effect가 생깁니다.
     // 이를 해결하기 위해 groups를 사용하여 각 경우에 해당하는 annotation을 사용합니다.
 
-    @NotNull(groups = UpdateCheck.class)
+//    @NotNull(groups = UpdateCheck.class)
     private Long id;
-    @NotBlank(groups = {SaveCheck.class, UpdateCheck.class})
+//    @NotBlank(groups = {SaveCheck.class, UpdateCheck.class})
     private String itemName;
-    @NotNull(groups = {SaveCheck.class, UpdateCheck.class})
-    @Range(min = 1000, max = 1000000)
+//    @NotNull(groups = {SaveCheck.class, UpdateCheck.class})
+//    @Range(min = 1000, max = 1000000)
     private Integer price;
 
-    @NotNull(groups = {SaveCheck.class, UpdateCheck.class})
-    @Max(value = 9999, groups = {SaveCheck.class})
+//    @NotNull(groups = {SaveCheck.class, UpdateCheck.class})
+//    @Max(value = 9999, groups = {SaveCheck.class})
     private Integer quantity;
 
     public Item() {
