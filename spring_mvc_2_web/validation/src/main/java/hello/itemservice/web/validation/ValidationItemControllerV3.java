@@ -54,6 +54,14 @@ public class ValidationItemControllerV3 {
     //    바인딩에 성공한 필드만 BeanValidation에서 검증하므로, 값이 정상적으로 들어온 이후 검증합니다.
     @PostMapping("/add")
     public String addItem(@Validated @ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+        // NOTE: Object 에러가 발생할 경우에 대한 오류 메시지 처리
+        if (item.getPrice() != null && item.getQuantity() != null) {
+            int resultPrice = item.getPrice() * item.getQuantity();
+            if (resultPrice < 10000) {
+                bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
+            }
+        }
+
         // 검증에 실패하면 다시 입력 폼으로 돌아가도록 설정합니다.
         if (bindingResult.hasErrors()) {
             log.info("errors = {}", bindingResult);
