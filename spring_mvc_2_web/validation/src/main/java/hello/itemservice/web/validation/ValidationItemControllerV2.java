@@ -10,6 +10,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
+import org.springframework.validation.ValidationUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -183,13 +184,18 @@ public class ValidationItemControllerV2 {
         log.info("objectName={}", bindingResult.getObjectName());
         log.info("target={}", bindingResult.getTarget());
 
-        // 검증 오류 결과 보관 객체 생성
-        Map<String, String> errors = new HashMap<>();
-
-        if (!StringUtils.hasText(item.getItemName())) {
-            // errors.properties에서 detail한 순서대로 값을 읽어옵니다. Level1이 더 구체적이기 때문에 Level1이 없을 때 Level2가 표현됩니다.
-            bindingResult.rejectValue("itemName", "required");
+        // 검증에 실패하면 다시 입력 폼으로 돌아가도록 설정합니다.
+        if (bindingResult.hasErrors()) {
+            log.info("errors = {}", bindingResult);
+            return "validation/v2/addForm";
         }
+
+        // if (!StringUtils.hasText(item.getItemName())) {
+        //     // errors.properties에서 detail한 순서대로 값을 읽어옵니다. Level1이 더 구체적이기 때문에 Level1이 없을 때 Level2가 표현됩니다.
+        //     bindingResult.rejectValue("itemName", "required");
+        // }
+        // 검증 로직: 공백이나 값이 안들어가는 경우 처리하는 방법으로, 위의 세 줄을 대체할 수 있습니다. 이 떄 간단한 비어있거나 띄어쓰기가 있는 경우만 처리합니다.
+        ValidationUtils.rejectIfEmptyOrWhitespace(bindingResult, "itemName", "required");
         if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) {
             bindingResult.rejectValue("price", "range", new Object[]{1000, 1000000}, null);
         }
@@ -202,12 +208,6 @@ public class ValidationItemControllerV2 {
             if (resultPrice < 10000) {
                 bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
             }
-        }
-        // 검증에 실패하면 다시 입력 폼으로 돌아가도록 설정합니다.
-        if (bindingResult.hasErrors()) {
-            log.info("errors = {}", errors);
-            model.addAttribute("errors", errors);
-            return "validation/v2/addForm";
         }
 
         // 성공 로직
