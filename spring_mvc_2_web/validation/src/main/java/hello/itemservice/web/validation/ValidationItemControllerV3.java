@@ -27,14 +27,6 @@ import java.util.Map;
 public class ValidationItemControllerV3 {
 
     private final ItemRepository itemRepository;
-    private final ItemValidator itemValidator;
-
-    // NOTE: 컨트롤러가 요청될 때, WebDataBinder가 생성되고 이 후 메서드 실행 시, 이 검증기부터 적용됩니다.
-    @InitBinder
-    public void init(WebDataBinder dataBinder) {
-        log.info("init binder {}", dataBinder);
-        dataBinder.addValidators(itemValidator);
-    }
 
     @GetMapping
     public String items(Model model) {
@@ -56,7 +48,10 @@ public class ValidationItemControllerV3 {
         return "validation/v3/addForm";
     }
 
-    // NOTE: @Validated는 앞에 등록해둔 Validator를 찾아서 메서드인 support와 validate를 실행합니다.
+    // NOTE: 검증 순서는 다음과 같습니다.
+    // 1. ModelAttribute가 검증 애노테이션을 확인합니다.
+    // 2. 성공하면 넘어가지만 Data Binding이 실패하면, typeMissmatch 등 오류를 FieldError에 추가합니다.
+    //    바인딩에 성공한 필드만 BeanValidation에서 검증하므로, 값이 정상적으로 들어온 이후 검증합니다.
     @PostMapping("/add")
     public String addItem(@Validated @ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
         // 검증에 실패하면 다시 입력 폼으로 돌아가도록 설정합니다.
