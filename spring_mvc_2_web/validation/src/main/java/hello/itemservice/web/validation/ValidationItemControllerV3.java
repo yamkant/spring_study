@@ -16,6 +16,7 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.naming.Binding;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -83,8 +84,22 @@ public class ValidationItemControllerV3 {
     }
 
     @PostMapping("/{itemId}/edit")
-    public String edit(@PathVariable Long itemId, @ModelAttribute Item item) {
+    public String edit(@PathVariable Long itemId, @Validated @ModelAttribute Item item, BindingResult bindingResult) {
         itemRepository.update(itemId, item);
+
+        if (item.getPrice() != null && item.getQuantity() != null) {
+            int resultPrice = item.getPrice() * item.getQuantity();
+            if (resultPrice < 10000) {
+                bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
+            }
+        }
+
+        // 검증에 실패하면 다시 입력 폼으로 돌아가도록 설정합니다.
+        if (bindingResult.hasErrors()) {
+            log.info("errors = {}", bindingResult);
+            return "validation/v3/editForm";
+        }
+
         return "redirect:/validation/v3/items/{itemId}";
     }
 
