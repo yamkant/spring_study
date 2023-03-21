@@ -10,7 +10,7 @@ import java.util.UUID;
 // TODO: logback mdc 검색해보기 -> 한 유저가 애플리케이션에서 로그를 찍는 경우, 단일 요청에 대해 어떤 요청인지 추적할 수 있도록 해줍니다.
 //       error / info 상황에서도 request 객체의 정보를 남길 수 있게 됩니다.
 @Slf4j
-public class LoginFilter implements Filter {
+public class LogFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         log.info("log filter init");
