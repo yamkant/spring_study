@@ -2,6 +2,7 @@ package hello.login.web;
 
 import hello.login.domain.member.Member;
 import hello.login.domain.member.MemberRepository;
+import hello.login.web.argumentresolver.Login;
 import hello.login.web.session.SessionManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -81,10 +82,24 @@ public class HomeController {
     }
 
     // NOTE: Spring에서 기본적으로 제공하는 애노테이션을 통해 세션 확인 프로세스를 처리합니다.
-    @GetMapping("/")
+//    @GetMapping("/")
     public String homeLoginV3Spring(
             @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember,
             Model model) {
+
+        // NOTE: 세션에 회원 데이터가 없으면 home으로
+        if (loginMember == null) {
+            return "home";
+        }
+
+        // NOTE: 세션이 유지되면 로그인으로 이동합니다.
+        model.addAttribute("member", loginMember);
+        return "loginHome";
+    }
+
+    // NOTE: Spring에서 기본적으로 제공하는 애노테이션을 통해 세션 확인 프로세스를 처리합니다.
+    @GetMapping("/")
+    public String homeLoginV3ArgumentResolver(@Login Member loginMember, Model model) {
 
         // NOTE: 세션에 회원 데이터가 없으면 home으로
         if (loginMember == null) {
