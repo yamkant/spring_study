@@ -21,6 +21,12 @@ public class WebConfig implements WebMvcConfigurer {
                 .order(1)
                 .addPathPatterns("/**") // 전체경로를 허용하되,
                 .excludePathPatterns("/css/**", "/*.ico", "/error"); // 해당경로는 배제합니다.
+
+        registry.addInterceptor(new LoginCheckInterceptor())
+                .order(2)
+                .addPathPatterns("/**")
+                .excludePathPatterns("/", "/members/add", "/login", "/logout",
+                        "/css/**", "/*.ico", "/error");
     }
 
 //    @Bean
@@ -33,7 +39,7 @@ public class WebConfig implements WebMvcConfigurer {
         return filterFilterRegistrationBean;
     }
 
-    @Bean
+//    @Bean
     public FilterRegistrationBean loginCheckFilter() {
         FilterRegistrationBean<Filter> filterFilterRegistrationBean = new FilterRegistrationBean<>();
         filterFilterRegistrationBean.setFilter(new LoginCheckFilter());
