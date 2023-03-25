@@ -1,11 +1,17 @@
 package hello.exception.servlet;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.Map;
 
 // 예외 발생과 오류 페이지 요청 흐름: 1에서 발생한 예외에 대한 페이지를 띄우기 위에 2 수행
 // 1. WAS(컨트롤러가 던진 예외처리) <- 필터 <- 서블릿 <- 인터셉터 <- 컨트롤러(예외발생)
@@ -41,6 +47,21 @@ public class ErrorPageController {
         return "error-page/500";
     }
 
+    // NOTE: MediaType이 json이면 해당 오류를 던지도록 합니다.
+    @RequestMapping(value="/error-page/500", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String, Object>> errorPage500Api(
+            HttpServletRequest request, HttpServletResponse response) {
+        log.info("API errorPage 500");
+
+        Map<String, Object> result = new HashMap<>();
+        Exception ex = (Exception) request.getAttribute(ERROR_EXCEPTION);
+        result.put("status", request.getAttribute(ERROR_STATUS_CODE));
+        result.put("message", ex.getMessage());
+
+        Integer statusCode = (Integer) request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
+        return new ResponseEntity<>(result, HttpStatus.valueOf(statusCode));
+    }
+
     // NOTE: error 발생시, request에 담기는 정보들을 볼 수 있습니다.
     private void printErrorInfo(HttpServletRequest request) {
         log.info("ERROR_EXCEPTION: ex=", request.getAttribute(ERROR_EXCEPTION));
@@ -53,4 +74,6 @@ public class ErrorPageController {
 
         log.info("dispatchType={}", request.getDispatcherType());
     }
+
+
 }
