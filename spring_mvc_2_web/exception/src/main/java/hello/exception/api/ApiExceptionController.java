@@ -19,6 +19,7 @@ public class ApiExceptionController {
     @GetMapping("/api/members/{id}")
     public MemberDto getMember(@PathVariable("id") String id) {
 
+        // NOTE: 이하 오류들은 Servlet Container까지 exception이 도달했다가 다시 와서 반환되는 형식입니다.
         if (id.equals("ex")) {
             throw new RuntimeException("잘못된 사용자");
         }
